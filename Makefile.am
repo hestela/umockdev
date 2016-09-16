@@ -23,7 +23,6 @@ bin_SCRIPTS =
 bin_PROGRAMS =
 lib_LTLIBRARIES =
 pkgconfiglib_DATA =
-noinst_PROGRAMS =
 INSTALL_EXEC_HOOKS =
 UNINSTALL_EXEC_HOOKS =
 CLEANFILES =
@@ -222,129 +221,6 @@ DISTCLEANFILES += \
 	$(srcdir)/src_umockdev_record_vala.stamp	\
 	$(NULL)
 
-# -------------------------------------------------------------
-# tests
-
-noinst_PROGRAMS += tests/chatter tests/chatter-socket-stream
-
-tests_chatter_SOURCES = tests/chatter.c
-
-tests_chatter_CFLAGS =		\
-	$(AM_CFLAGS)		\
-	$(NULL)
-
-tests_chatter_socket_stream_SOURCES = tests/chatter-socket-stream.c
-
-tests_chatter_socket_stream_CFLAGS =	\
-	$(AM_CFLAGS)			\
-	$(NULL)
-
-noinst_PROGRAMS += tests/test-umockdev tests/test-ioctl-tree
-
-tests_test_umockdev_SOURCES = tests/test-umockdev.c
-
-tests_test_umockdev_CFLAGS =	\
-	$(AM_CFLAGS)		\
-	$(GLIB_CFLAGS)		\
-	$(LIBUDEV_CFLAGS)	\
-	$(GUDEV_CFLAGS)		\
-	-I $(top_srcdir)/src	\
-	$(NULL)
-
-tests_test_umockdev_LDADD =	\
-	libumockdev.la		\
-	$(GLIB_LIBS)		\
-	$(LIBUDEV_LIBS)		\
-	$(GUDEV_LIBS)		\
-	$(NULL)
-
-tests_test_ioctl_tree_SOURCES =	\
-	src/ioctl_tree.c	\
-	tests/test-ioctl-tree.c	\
-	$(NULL)
-
-tests_test_ioctl_tree_CFLAGS =	\
-	$(AM_CFLAGS)		\
-	$(GLIB_CFLAGS)		\
-	-I $(top_srcdir)/src	\
-	$(NULL)
-
-tests_test_ioctl_tree_LDADD =	\
-	$(GLIB_LIBS)		\
-	$(NULL)
-
-CHECKS += tests/test-umockdev tests/test-ioctl-tree
-
-EXTRA_DIST += tests/test-umockdev.py tests/xorg-dummy.conf tests/test-static-code
-
-noinst_PROGRAMS += tests/test-umockdev-vala tests/test-umockdev-run tests/test-umockdev-record
-
-tests_test_umockdev_vala_SOURCES = 	\
-	tests/test-umockdev-vala.vala	\
-	tests/assertions.vapi		\
-	tests/ioctl.vapi		\
-	src/posix_extra.vapi		\
-	$(NULL)
-
-tests_test_umockdev_vala_CFLAGS = $(GLIB_CFLAGS) $(GUDEV_CFLAGS) -I $(srcdir)/src -I src -w
-tests_test_umockdev_vala_LDADD = $(GLIB_LIBS) $(GUDEV_LIBS) libumockdev.la
-tests_test_umockdev_vala_VALAFLAGS =		\
-	--vapidir tests			\
-	--vapidir $(top_builddir)/src	\
-	--pkg umockdev-1.0		\
-	--pkg glib-2.0			\
-	--pkg gio-2.0			\
-	--pkg gudev-1.0			\
-	$(AM_VALAFLAGS)			\
-	$(NULL)
-
-tests_test_umockdev_run_SOURCES = 	\
-	tests/test-umockdev-run.vala	\
-	tests/assertions.vapi		\
-	src/config.vapi			\
-	$(NULL)
-
-tests_test_umockdev_run_CFLAGS = $(GLIB_CFLAGS) -w
-tests_test_umockdev_run_LDADD = $(GLIB_LIBS)
-tests_test_umockdev_run_VALAFLAGS =	\
-	--vapidir tests			\
-	--pkg glib-2.0			\
-	--pkg gio-2.0			\
-	--pkg posix			\
-	$(AM_VALAFLAGS)			\
-	$(NULL)
-
-tests_test_umockdev_record_SOURCES = 	\
-	tests/test-umockdev-record.vala	\
-	tests/assertions.vapi		\
-	src/posix_extra.vapi		\
-	$(NULL)
-
-tests_test_umockdev_record_CFLAGS = $(GLIB_CFLAGS) -I $(srcdir)/src -I src -w
-tests_test_umockdev_record_LDADD = $(GLIB_LIBS) libumockdev.la -lutil
-tests_test_umockdev_record_VALAFLAGS =	\
-	--vapidir src			\
-	--vapidir tests			\
-	--pkg glib-2.0			\
-	--pkg gio-2.0			\
-	--pkg gio-unix-2.0		\
-	--pkg posix			\
-	--pkg linux			\
-	--pkg umockdev-1.0		\
-	$(AM_VALAFLAGS)			\
-	$(NULL)
-
-DISTCLEANFILES += \
-	tests/test-umockdev-vala.c	\
-	tests/test-umockdev-run.c	\
-	tests/test-umockdev-record.c	\
-	$(srcdir)/tests_test_umockdev_vala_vala.stamp	\
-	$(srcdir)/tests_test_integration_vala.stamp	\
-	$(srcdir)/tests_test_umockdev_record_vala.stamp	\
-	$(NULL)
-
-CHECKS += tests/test-umockdev-vala tests/test-umockdev-run tests/test-umockdev-record
-
 # we do not use TESTS to avoid using the parallel test runner which does not
 # give any useful output on failures
 check-local: $(CHECKS)
@@ -375,13 +251,6 @@ check-installed: $(CHECKS)
 		NO_LT=tests/.libs/`basename $$f`; \
 		[ -x $$NO_LT ] && $(INSTALL_TESTS_ENVIRONMENT) $$NO_LT || $(INSTALL_TESTS_ENVIRONMENT) $$f; \
 	done
-
-if HAVE_INTROSPECTION
-if HAVE_PYTHON
-	@echo "== Running GI test with $(PYTHON) against installed system =="
-	$(PYTEST_INSTALL) $(srcdir)/tests/test-umockdev.py
-endif
-endif
 
 check-valgrind:
 	EXEC_NAME="valgrind --leak-check=full --show-possibly-lost=no -q" G_DEBUG=gc-friendly $(MAKE) check
@@ -419,7 +288,7 @@ CODE_COVERAGE_LCOV_OPTIONS = --base-directory $(top_builddir)
 # developer tools
 
 indent:
-	indent -linux -ppi4 -psl -l120 -i4 src/*.h src/*.c tests/*.c
+	indent -linux -ppi4 -psl -l120 -i4 src/*.h src/*.c
 	find -name '*~' -exec rm '{}' \;
 
 install-exec-hook: $(INSTALL_EXEC_HOOKS)

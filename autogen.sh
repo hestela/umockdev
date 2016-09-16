@@ -19,7 +19,7 @@
 set -e
 
 mkdir -p m4
-if type gtkdocize > /dev/null; then
+if type gtkdocize 2> /dev/null; then
     gtkdocize --docdir docs/
     args="--enable-gtk-doc"
 else
@@ -33,5 +33,9 @@ else
     echo "lcov not installed, not enabling code coverage"
 fi
 
+# Poor attempt at fixing missing libs in Make
+#flags=`pkg-config --libs --cflags gudev-1.0``pkg-config --libs --cflags gio-unix-2.0``pkg-config --libs --cflags gtk+-2.0``pkg-config --libs --cflags glib-2.0`
+cflags=`pkg-config --cflags gudev-1.0``pkg-config --cflags gio-unix-2.0``pkg-config --cflags gtk+-2.0``pkg-config --cflags glib-2.0`
+ldflags=`pkg-config --libs gudev-1.0``pkg-config --libs gio-unix-2.0``pkg-config --libs gtk+-2.0``pkg-config --libs glib-2.0`
 autoreconf --install --symlink
-[ -n "$NOCONFIGURE" ] || ./configure $args "$@"
+[ -n "$NOCONFIGURE" ] || CFLAGS=$cflags LDFLAGS=$ldflags ./configure $args "$@"

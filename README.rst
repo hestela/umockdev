@@ -248,7 +248,7 @@ devices.
   Press Control-C again to stop evtest.
 
 
-Build, Test, Run
+Build, Run
 ================
 If you want to build umockdev from a git checkout, run ./autogen.sh to build
 the autotools files; you need autoreconf, autoconf, automake, libtool, and
@@ -260,14 +260,8 @@ autotools build system:
 - Run ``./configure`` first; you may want to supply ``--prefix``,
   ``--sysconfdir``, and other options, see ``./configure --help``.
 - Run ``make`` to build the project.
-- Run ``make check`` to run the tests against the build tree.
-- Run ``make check-code-coverage`` to run the tests against the build tree and
-  measure the code coverage (requires configuring with --enable-code-coverage).
-  Report will be written to ``umockdev-*-coverage/index.html``.
 - Run ``make install`` as root to install into the configured prefix
   (``/usr/local`` by default).
-- Run ``make check-installed`` to run the test suite against the installed
-  version of umockdev.
 
 If you don't want to install umockdev but use it from the build tree, set
 these environment variables, assuming that your current directory is the
